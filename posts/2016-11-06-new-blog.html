@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>alexanderlobov - New blog</title>
+        <title>alexanderlobov - Creating blog using Hakyll</title>
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
     </head>
     <body>
@@ -17,7 +17,7 @@
         </div>
 
         <div id="content">
-            <h1>New blog</h1>
+            <h1>Creating blog using Hakyll</h1>
 
             <div class="info">
     Posted on November  6, 2016
@@ -26,6 +26,36 @@
 
 <p>This is my new blog and it is created using <a href="https://jaspervdj.be/hakyll">Hakyll</a>.</p>
 <p>I plan to move here my other blogs: <a href="http://tardenoisean.blogspot.com" class="uri">http://tardenoisean.blogspot.com</a> and <a href="http://tardenoisean.livejournal.com" class="uri">http://tardenoisean.livejournal.com</a>.</p>
+<h2 id="steps-performed-to-create-this-site">Steps performed to create this site</h2>
+<p>Created <a href="https://github.com/alexanderlobov/alexanderlobov.github.io">repository</a> to host the site using <a href="https://pages.github.com/">Github pages</a></p>
+<p>Created <a href="https://github.com/alexanderlobov/homepage">repository</a> to host source code for site generation.</p>
+<p>Cloned <a href="https://github.com/alexanderlobov/homepage">repository</a> with source code.</p>
+<p>Initialized stack and built site.</p>
+<pre><code>$ hakyll-init .
+$ stack init
+$ stack build
+$ stack exec site build</code></pre>
+<p>If you want to see the result</p>
+<pre><code>$ stack exec site watch</code></pre>
+<p>Cleaned up stuff that I did not need, tweaked <code>.gitignore</code>.</p>
+<p>Committed</p>
+<pre><code>$ stack exec site clean
+$ git add --all
+$ git commit -m &quot;Initial commit&quot;
+$ git push origin master</code></pre>
+<p>Added <a href>site repository</a> as a git submodule</p>
+<pre><code>git submodule add git@github.com:alexanderlobov/alexanderlobov.github.io.git _site</code></pre>
+<p>Build site and commit</p>
+<pre><code>stack exec site build
+cd _site
+git add --all
+git commit -m &quot;Update from 01f6054&quot;
+git push origin master</code></pre>
+<h2 id="reference">Reference</h2>
+<ul>
+<li><a href="https://jaspervdj.be/hakyll/tutorials.html">Hakyll tutorials</a></li>
+<li><a href="http://timbaumann.info/posts/2013-08-04-hakyll-github-and-travis.html">Tim Baumann’s tutorial</a></li>
+</ul>
 
         </div>
         <div id="footer">
