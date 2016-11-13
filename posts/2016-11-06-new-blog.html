@@ -83,7 +83,7 @@ git add --all
 git commit -m &quot;Update from 01f6054&quot;
 git push origin master</code></pre>
 <h3 id="git-submodules-to-be-or-not-to-be">Git submodules: to be or not to be</h3>
-<p>Using git submodules has a disadvantage: if you run <code>clean</code> or <code>rebuild</code> command, <code>_site</code> directory is removed and you need to make extra steps to restore git repository in this directory. I did not found it convenient. So I deleted the submodule and began to use separate working copy of site repository. If you want to deploy site, you need to copy newly generated stuff to this working copy. It is possible to configure “deploy” command for <code>site</code> executable.</p>
+<p>Using git submodules has a disadvantage: if you run <code>clean</code> or <code>rebuild</code> command, <code>_site</code> directory is removed and you need to make extra steps to restore git repository in this directory. I did not found it convenient. So I deleted the submodule and began to use separate working copy of site repository. If you want to deploy site, you need to copy newly generated stuff to this working copy. It is possible <a href="2016-11-11-deploying-a-site-to-git.html">to configure</a> “deploy” command for <code>site</code> executable.</p>
 <h2 id="reference">Reference</h2>
 <ul>
 <li><a href="https://jaspervdj.be/hakyll/tutorials.html">Hakyll tutorials</a></li>
