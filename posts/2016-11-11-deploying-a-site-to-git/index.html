@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+
+        <!-- Yandex.Metrika counter -->
+        <script type="text/javascript">
+            (function (d, w, c) {
+                (w[c] = w[c] || []).push(function() {
+                    try {
+                        w.yaCounter40839224 = new Ya.Metrika({
+                            id:40839224,
+                            clickmap:true,
+                            trackLinks:true,
+                            accurateTrackBounce:true
+                        });
+                    } catch(e) { }
+                });
+
+                var n = d.getElementsByTagName("script")[0],
+                    s = d.createElement("script"),
+                    f = function () { n.parentNode.insertBefore(s, n); };
+                s.type = "text/javascript";
+                s.async = true;
+                s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+                if (w.opera == "[object Opera]") {
+                    d.addEventListener("DOMContentLoaded", f, false);
+                } else { f(); }
+            })(document, window, "yandex_metrika_callbacks");
+        </script>
+        <noscript><div><img src="https://mc.yandex.ru/watch/40839224" style="position:absolute; left:-9999px;" alt /></div></noscript>
+        <!-- /Yandex.Metrika counter -->
+
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>alexanderlobov - Deploying a site to git</title>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/syntax.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../../">alexanderlobov</a>
+            </div>
+            <div id="navigation">
+                <a href="../../archive/">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Deploying a site to git</h1>
+
+            <div class="info">
+    Posted on November 11, 2016
+    
+</div>
+
+<p>I use <a href="https://jaspervdj.be/hakyll">Hakyll</a> to create my blog and <a href="http://pages.github.com">Github pages</a> for hosting. I deploy the site as follows:</p>
+<p>Replace <code>hakyll</code> to <code>hakyllWith config</code> in the code. Define config:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">config ::</span> <span class="dt">Configuration</span>
+config <span class="fu">=</span> defaultConfiguration
+    { deployCommand <span class="fu">=</span> <span class="st">&quot;./deploy&quot;</span>
+    }</code></pre></div>
+<p>Code of <code>deploy</code> script:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="ot">SITE_PATH=</span><span class="st">&quot;../alexanderlobov.github.io/&quot;</span>
+
+<span class="kw">echo</span> Deploying site
+
+<span class="kw">if</span> <span class="kw">git</span> diff-index --quiet HEAD<span class="kw">;</span> <span class="kw">then</span>
+    <span class="kw">echo</span> <span class="st">&quot;No changes in the working copy of the source code found&quot;</span>
+    <span class="ot">commit_hash=</span><span class="kw">`git</span> log -n 1 --oneline <span class="kw">|</span> <span class="kw">cut</span> -f 1 -d <span class="st">' '</span><span class="kw">`</span>
+    <span class="kw">echo</span> Last commit is <span class="ot">$commit_hash</span>
+    <span class="kw">cp</span> -r _site/* <span class="ot">$SITE_PATH</span>
+    <span class="kw">cd</span> <span class="ot">$SITE_PATH</span>
+    <span class="kw">git</span> status
+
+    <span class="kw">echo</span> <span class="st">&quot;Commit the changes to </span><span class="ot">$SITE_PATH</span><span class="st"> (y/n)?&quot;</span>
+    <span class="kw">read</span> <span class="ot">answer</span>
+    <span class="kw">case</span> <span class="ot">$answer</span><span class="kw"> in</span>
+        y <span class="kw">|</span> yes<span class="kw">)</span> <span class="kw">git</span> add -A <span class="kw">&amp;&amp;</span> <span class="kw">git</span> commit -m <span class="st">&quot;Updating from </span><span class="ot">$commit_hash</span><span class="st">&quot;</span> <span class="kw">&amp;&amp;</span> <span class="kw">git</span> push origin master <span class="kw">;;</span>
+        <span class="kw">*</span>) <span class="kw">echo</span> No changes has been commited<span class="kw">;</span> <span class="kw">exit</span> 2 <span class="kw">;;</span>
+    <span class="kw">esac</span>
+<span class="kw">else</span>
+    <span class="kw">echo</span> <span class="st">&quot;There are changes in the working copy.&quot;</span>
+    <span class="kw">echo</span> <span class="st">&quot;You should commit them before deploying.&quot;</span>
+    <span class="kw">exit</span> 1
+<span class="kw">fi</span></code></pre></div>
+<p>Don’t forget to make <code>deploy</code> executable:</p>
+<pre><code>chmod u+x deploy</code></pre>
+<p>You can deploy in two ways</p>
+<ol style="list-style-type: decimal">
+<li><code>./deploy</code></li>
+<li><code>stack exec site deploy</code></li>
+</ol>
+
+<div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+        this.page.url = 'http://alexanderlobov.ru/posts/2016-11-11-deploying-a-site-to-git/';
+        this.page.identifier = '/posts/2016-11-11-deploying-a-site-to-git/';
+    };
+    (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = '//alexanderlobov.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+     Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by
+     Disqus.</a>
+</noscript>
+
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>

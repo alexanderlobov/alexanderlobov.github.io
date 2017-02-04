@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+
+        <!-- Yandex.Metrika counter -->
+        <script type="text/javascript">
+            (function (d, w, c) {
+                (w[c] = w[c] || []).push(function() {
+                    try {
+                        w.yaCounter40839224 = new Ya.Metrika({
+                            id:40839224,
+                            clickmap:true,
+                            trackLinks:true,
+                            accurateTrackBounce:true
+                        });
+                    } catch(e) { }
+                });
+
+                var n = d.getElementsByTagName("script")[0],
+                    s = d.createElement("script"),
+                    f = function () { n.parentNode.insertBefore(s, n); };
+                s.type = "text/javascript";
+                s.async = true;
+                s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+                if (w.opera == "[object Opera]") {
+                    d.addEventListener("DOMContentLoaded", f, false);
+                } else { f(); }
+            })(document, window, "yandex_metrika_callbacks");
+        </script>
+        <noscript><div><img src="https://mc.yandex.ru/watch/40839224" style="position:absolute; left:-9999px;" alt /></div></noscript>
+        <!-- /Yandex.Metrika counter -->
+
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>alexanderlobov - How to setup Transmission torrent client with web interface and logging</title>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/syntax.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../../">alexanderlobov</a>
+            </div>
+            <div id="navigation">
+                <a href="../../archive/">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>How to setup Transmission torrent client with web interface and logging</h1>
+
+            <div class="info">
+    Posted on February  3, 2017
+    
+</div>
+
+<p><a href="../../posts/2016-11-06-new-blog/">test link with html</a> <a href="../2016-11-06-new-blog">test link</a></p>
+<p>This tutorial is about installation and configuration of Transmission torrent client on Ubuntu 14.04.</p>
+<h2 id="installation">Installation</h2>
+<p>First, install <a href="https://transmissionbt.com/">Transmission</a>:</p>
+<pre><code>sudo apt-get install transmission-daemon</code></pre>
+<p>After that, Transmission web interface should be available on localhost:9091.</p>
+<p>Next, I want web interface to be available from other computers in my local network. My network is very simple: it is just a router that shares Internet via Wi-Fi. In this case,</p>
+<ol style="list-style-type: decimal">
+<li><p>configure your router to reserve ip address for the computer with Tranmission run. For example, 192.168.1.101. In my case (TP-Link router) it is configured in DHCP -&gt; Address Reservation section.</p></li>
+<li><p>Add a line to /etc/hosts on machines you use to access the web interface:</p>
+<pre><code>192.168.1.101 &lt;desired hostname&gt;</code></pre>
+<p>After that it is possible to use this hostname instead of ip.</p></li>
+<li><p>Change default Transmission password. First, stop the daemon:</p>
+<pre><code>sudo service transmission-daemon stop</code></pre>
+<p>If you do not stop the daemon, it will overwrite the config file and you will lost your changes.</p>
+<p>Edit the password</p>
+<pre><code>sudo vim /var/lib/transmission-daemon/info/settings.json</code></pre>
+<p>You need section “rpc-password”.</p></li>
+<li><p>Add ip addresses from your network to the white list (in the same config file, settings.json), for example:</p>
+<pre><code>&quot;rpc-whitelist&quot;: &quot;127.0.0.1,192.168.1.*&quot;</code></pre></li>
+<li><p>Start the daemon</p>
+<pre><code>sudo service transmission-daemon start</code></pre></li>
+</ol>
+<h2 id="logging">Logging</h2>
+<p><em>When I run transmission for the first time, it seemed to me, that Transmission does not write logs. Then I found the log in <code>/var/logs/upstart/transmission-daemon.log</code>. So this section is redundant, but I leave it here, because it was useful experience anyway.</em></p>
+<p>It turns out that Transmission does not write any logs by default. If you want to have logs, you need further configuration. If you do not want logs, you can safely skip this section.</p>
+<p>You can set log file and log level in transmission-daemon command line options. As it is a daemon, we need to add this options to <code>/etc/default/transmission-daemon</code> config file.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ot">LOGFILE=</span><span class="st">&quot;/var/log/transmission.log&quot;</span>
+
+<span class="co"># Default options for daemon, see transmission-daemon(1) for more options</span>
+<span class="ot">OPTIONS=</span><span class="st">&quot;--config-dir </span><span class="ot">$CONFIG_DIR</span><span class="st"> --logfile </span><span class="ot">$LOGFILE</span><span class="st"> --log-info&quot;</span></code></pre></div>
+<p>Transmission can not create log file because of lack of rights. So, create log file and change access rights.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">touch</span> /var/log/transmission.log
+<span class="kw">sudo</span> chown debian-transmission /var/log/transmission.log</code></pre></div>
+<h3 id="log-rotation">Log rotation</h3>
+<p>Add a file <code>/etc/logrotate.d/transmission</code> containing</p>
+<pre><code>/var/log/transmission.log {
+        rotate 7
+        daily
+        missingok
+        notifempty
+        delaycompress
+        compress
+}</code></pre>
+<h2 id="reference">Reference</h2>
+<p>Log configuration is based on <a href="https://shpargalki.org.ua/162/logi-transmission">this article</a>.</p>
+
+<div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+        this.page.url = 'http://alexanderlobov.ru/posts/2017-02-03-transmission-setup/';
+        this.page.identifier = '/posts/2017-02-03-transmission-setup/';
+    };
+    (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = '//alexanderlobov.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+     Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by
+     Disqus.</a>
+</noscript>
+
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
