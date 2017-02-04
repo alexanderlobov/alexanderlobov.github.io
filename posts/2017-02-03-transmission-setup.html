@@ -78,6 +78,7 @@
 <pre><code>sudo service transmission-daemon start</code></pre></li>
 </ol>
 <h2 id="logging">Logging</h2>
+<p><em>When I run transmission for the first time, it seemed to me, that Transmission does not write logs. Then I found the log in <code>/var/logs/upstart/transmission-daemon.log</code>. So this section is redundant, but I leave it here, because it was useful experience anyway.</em></p>
 <p>It turns out that Transmission does not write any logs by default. If you want to have logs, you need further configuration. If you do not want logs, you can safely skip this section.</p>
 <p>You can set log file and log level in transmission-daemon command line options. As it is a daemon, we need to add this options to <code>/etc/default/transmission-daemon</code> config file.</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ot">LOGFILE=</span><span class="st">&quot;/var/log/transmission.log&quot;</span>
