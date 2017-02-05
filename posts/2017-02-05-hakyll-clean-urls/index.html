@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+
+        <!-- Yandex.Metrika counter -->
+        <script type="text/javascript">
+            (function (d, w, c) {
+                (w[c] = w[c] || []).push(function() {
+                    try {
+                        w.yaCounter40839224 = new Ya.Metrika({
+                            id:40839224,
+                            clickmap:true,
+                            trackLinks:true,
+                            accurateTrackBounce:true
+                        });
+                    } catch(e) { }
+                });
+
+                var n = d.getElementsByTagName("script")[0],
+                    s = d.createElement("script"),
+                    f = function () { n.parentNode.insertBefore(s, n); };
+                s.type = "text/javascript";
+                s.async = true;
+                s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+                if (w.opera == "[object Opera]") {
+                    d.addEventListener("DOMContentLoaded", f, false);
+                } else { f(); }
+            })(document, window, "yandex_metrika_callbacks");
+        </script>
+        <noscript><div><img src="https://mc.yandex.ru/watch/40839224" style="position:absolute; left:-9999px;" alt /></div></noscript>
+        <!-- /Yandex.Metrika counter -->
+
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>alexanderlobov - Urls without html extension in Hakyll</title>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/syntax.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../../">alexanderlobov</a>
+            </div>
+            <div id="navigation">
+                <a href="../../archive/">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Urls without html extension in Hakyll</h1>
+
+            <div class="info">
+    Posted on February  5, 2017
+    
+</div>
+
+<p>I have begun to use urls without an extension for this site. For example,</p>
+<pre><code>alexanderlobov.ru/posts/2016-11-11-deploying-a-site-to-git/</code></pre>
+<p>instead of</p>
+<pre><code>alexanderlobov.ru/posts/2016-11-11-deploying-a-site-to-git.html</code></pre>
+<p>The idea and implementation are based on <a href="http://yannesposito.com/Scratch/en/blog/Hakyll-setup/#simplify-url">Yann Esposito’s article</a>.</p>
+<p>Why are such urls better? Because <code>html</code> extension is an implementation detail, and url is an interface of site. It is bad to place implementation details in interface. If I change the site engine (e.g. to <a href="http://www.yesodweb.com/">Yesod</a>), urls with an extension will inevitable change. It will result in issues with broken links, search engines indexation, integration with Disqus and similar systems.</p>
+<p>My solution is mostly the same as Yann uses. The only difference is that I also changes url and identifier used by <a href="http://disqus.com">Disqus</a>.</p>
+<p>You can see all changes in <a href="https://github.com/alexanderlobov/homepage/commit/fb9446a5ad238c041c407cb2e7e35a1f9aeab491">this commit</a>.</p>
+<p>Here is a short summary.</p>
+<p>Introduce new routing function</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">niceRoute ::</span> <span class="dt">Routes</span>
+niceRoute <span class="fu">=</span> customRoute createIndexRoute
+    <span class="kw">where</span> createIndexRoute identifier <span class="fu">=</span>
+            takeDirectory p <span class="fu">&lt;/&gt;</span> takeBaseName p <span class="fu">&lt;/&gt;</span> <span class="st">&quot;index.html&quot;</span>
+            <span class="kw">where</span> p <span class="fu">=</span> toFilePath identifier</code></pre></div>
+<p>Use it for all pathes you want to change. I do it for <code>posts/*</code> and <code>archive.html</code>.</p>
+<p>You need to changes hyperlinks in HTML code. <code>removeIndexHtml</code> do this</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">removeIndexHtml ::</span> <span class="dt">Item</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Compiler</span> (<span class="dt">Item</span> <span class="dt">String</span>)
+removeIndexHtml item <span class="fu">=</span> return <span class="fu">$</span> fmap (withUrls removeIndexStr) item
+
+<span class="ot">removeIndexStr ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span>
+removeIndexStr url <span class="fu">=</span> <span class="kw">case</span> splitFileName url <span class="kw">of</span>
+    (dir, <span class="st">&quot;index.html&quot;</span>) <span class="fu">|</span> isLocal dir <span class="ot">-&gt;</span> dir
+                        <span class="fu">|</span> otherwise <span class="ot">-&gt;</span> url
+    _ <span class="ot">-&gt;</span> url
+    <span class="kw">where</span>
+<span class="ot">        isLocal ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+        isLocal uri <span class="fu">=</span> not (<span class="st">&quot;://&quot;</span> <span class="ot">`isInfixOf`</span> uri)</code></pre></div>
+<p>I use it for <code>index.html</code>, <code>archive.html</code> and <code>posts/*</code>.</p>
+<p>If you have hardcoded links in your html or template, you need to fix them. I have to do it for <code>templates/default.html</code>.</p>
+<p>I use <a href="http://disqus.com">Disqus</a> for comments. And Disqus <a href="https://help.disqus.com/customer/en/portal/articles/2158629">recommends</a> to explicitly set <code>url</code> and <code>identifier</code> variables. I used <code>$url$</code> variable in Hakyll templates before, but now it contains urls with <code>index.html</code> suffix. So I need to fix it too. I introduce a new context variable:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">myUrlField ::</span> <span class="dt">Context</span> a
+myUrlField <span class="fu">=</span> field <span class="st">&quot;myurl&quot;</span> <span class="fu">$</span>
+    fmap (maybe empty <span class="fu">$</span> removeIndexStr <span class="fu">.</span> toUrl) <span class="fu">.</span> getRoute <span class="fu">.</span> itemIdentifier</code></pre></div>
+<p>It is implemented similar to default url field, but uses <code>removeIndexStr</code> to trim <code>index.html</code>.</p>
+<p>I add this field to posts’ context:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">postCtx ::</span> <span class="dt">Context</span> <span class="dt">String</span>
+postCtx <span class="fu">=</span>
+    dateField <span class="st">&quot;date&quot;</span> <span class="st">&quot;%B %e, %Y&quot;</span> <span class="ot">`mappend`</span>
+    myUrlField <span class="ot">`mappend`</span>
+    defaultContext</code></pre></div>
+<p>And this is a part of Disqus script:</p>
+<div class="sourceCode"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> disqus_config <span class="op">=</span> <span class="kw">function</span> () <span class="op">{</span>
+    <span class="kw">this</span>.<span class="va">page</span>.<span class="at">url</span> <span class="op">=</span> <span class="st">'http://alexanderlobov.ru$myurl$'</span><span class="op">;</span>
+    <span class="kw">this</span>.<span class="va">page</span>.<span class="at">identifier</span> <span class="op">=</span> <span class="st">'$myurl$'</span><span class="op">;</span>
+<span class="op">};</span></code></pre></div>
+
+<div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+        this.page.url = 'http://alexanderlobov.ru/posts/2017-02-05-hakyll-clean-urls/';
+        this.page.identifier = '/posts/2017-02-05-hakyll-clean-urls/';
+    };
+    (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = '//alexanderlobov.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>
+     Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by
+     Disqus.</a>
+</noscript>
+
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>

@@ -99,6 +99,10 @@ brew install byobu</code></pre>
 $ brew cask install font-inconsolata</code></pre>
 <h2 id="remove-these-strange-square-brackets-in-terminal">Remove these strange square brackets in terminal</h2>
 <p>Edit -&gt; Marks -&gt; Automatically Mark Prompt Lines</p>
+<h2 id="copying-from-system-clipboard-does-not-work-in-tmux-and-vim">Copying from system clipboard does not work in tmux and vim</h2>
+<p>There are several issues. First, default vim compiled without <code>+clipboard</code> options. It seems that version from homebrew is good. It is also possible to install macvim, and use <code>mvim -v</code> to run macvim in console.</p>
+<p>Second, clipboard does not work in tmux. I use byobu based on tmux, so it does not work too. One of the solutions is <a href="https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard">this</a>. I have installed <code>reattach-to-user-namespace</code>, added set-option -g default-command “reattach-to-user-namespace -l zsh” to <code>.tmux.conf</code>, but it does not help.</p>
+<p>So I need more time to solve the issue :(</p>
 
 <div id="disqus_thread"></div>
 <script>
