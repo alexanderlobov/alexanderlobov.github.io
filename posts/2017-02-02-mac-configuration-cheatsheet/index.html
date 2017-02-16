@@ -103,6 +103,14 @@ $ brew cask install font-inconsolata</code></pre>
 <p>There are several issues. First, default vim compiled without <code>+clipboard</code> options. It seems that version from homebrew is good. It is also possible to install macvim, and use <code>mvim -v</code> to run macvim in console.</p>
 <p>Second, clipboard does not work in tmux. I use byobu based on tmux, so it does not work too. One of the solutions is <a href="https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard">this</a>. I have installed <code>reattach-to-user-namespace</code>, added set-option -g default-command “reattach-to-user-namespace -l zsh” to <code>.tmux.conf</code>, but it does not help.</p>
 <p>So I need more time to solve the issue :(</p>
+<h2 id="highlight-broken-links-in-terminal">Highlight broken links in terminal</h2>
+<ol style="list-style-type: decimal">
+<li>Install GNU coreutils: <code>brew install coreutils</code></li>
+<li><p>Put the following in your <code>~/.bash_rc</code>:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">eval</span> <span class="ot">$(</span><span class="kw">gdircolors</span><span class="ot">)</span>
+<span class="kw">alias</span> ls=<span class="st">&quot;gls --color=auto&quot;</span></code></pre></div></li>
+</ol>
+<p><a href="http://superuser.com/questions/401243/mac-osx-cannot-color-broken-symlinks">Source</a></p>
 
 <div id="disqus_thread"></div>
 <script>
