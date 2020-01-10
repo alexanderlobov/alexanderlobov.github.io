@@ -1,3 +1,3 @@
 # alexanderlobov.github.io
 Personal site.
-Hosted on http://alexanderlobov.ru
+Hosted on http://alexanderlobov.net
